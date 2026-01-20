@@ -791,6 +791,7 @@ GameObject:
   - component: {fileID: 1915507079}
   - component: {fileID: 1915507080}
   - component: {fileID: 1915507081}
+  - component: {fileID: 1915507082}
   m_Layer: 0
   m_Name: GameBoard Controller
   m_TagString: Untagged
@@ -847,6 +848,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CellManager
   listCell: []
+--- !u!114 &1915507082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915507078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5facd6d48417f8b4a9dc66a5f2f3c7d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClearCell
+  cellManager: {fileID: 1915507081}
+  gridSize: 8
+  cellSize: 1
 --- !u!1 &2036943829
 GameObject:
   m_ObjectHideFlags: 0

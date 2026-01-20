@@ -16,6 +16,9 @@ public class ShapeCheckPos : MonoBehaviour
     private float shapeCellSize = 1f; // Kích thước ô theo local của shape
     public Vector3 AnchorLocalOffset => anchorLocalOffset; // Local offset của anchor block (min corner)
     public Vector2Int? CurrentHighlightedGrid => currentHighlightedGrid;
+    
+    // Getter cho shape pattern để ShapeClick có thể access
+    public Vector2Int[] GetShapePattern() => shapePattern;
 
     private void Start()
     {
