@@ -11,11 +11,13 @@ public class ShapeClick : MonoBehaviour
     private bool isDragging = false;
     private Tween returnTween;
     private ShapeCheckPos shapeCheckPos;
+    private ShapeSnap _shapeSnap;
 
     private void Start()
     {
         originalPosition = transform.position;
         shapeCheckPos = GetComponent<ShapeCheckPos>();
+        _shapeSnap = GetComponent<ShapeSnap>();
     }
 
     // Update is called once per frame
@@ -43,7 +45,7 @@ public class ShapeClick : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position = (Vector3)mousePos + (Vector3)dragOffset;
-            
+
             // Gọi trực tiếp ShapeCheckPos trên cùng object
             if (shapeCheckPos != null)
             {
@@ -54,15 +56,27 @@ public class ShapeClick : MonoBehaviour
         if (Input.GetMouseButtonUp(0) && isDragging)
         {
             isDragging = false;
-            
-            // Clear highlights khi buông
-            if (shapeCheckPos != null)
+
+            bool snapped = false;
+            if (_shapeSnap != null)
             {
+                if (_shapeSnap.TryGetSnappedWorldPosition(out Vector3 snapPos))
+                {
+                    returnTween?.Kill();
+                    returnTween = transform.DOMove(snapPos, returnDuration);
+                    originalPosition = snapPos;
+                    snapped = true;
+                }
+
+                // Clear highlights khi buông
                 shapeCheckPos.ClearHighlights();
             }
 
-            // Return về vị trí ban đầu với DOTween
-            returnTween = transform.DOMove(originalPosition, returnDuration);
+            if (!snapped)
+            {
+                // Return về vị trí ban đầu với DOTween
+                returnTween = transform.DOMove(originalPosition, returnDuration);
+            }
         }
     }
 }

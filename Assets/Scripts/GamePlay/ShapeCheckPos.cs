@@ -13,6 +13,8 @@ public class ShapeCheckPos : MonoBehaviour
     private Vector2Int gridSize = new Vector2Int(8, 8); // 8x8 grid
     private Vector2Int? currentHighlightedGrid; // Lưu vị trí highlight hiện tại
     private Vector3 anchorLocalOffset; // Local offset của anchor block (min corner)
+    public Vector3 AnchorLocalOffset => anchorLocalOffset; // Local offset của anchor block (min corner)
+    public Vector2Int? CurrentHighlightedGrid => currentHighlightedGrid;
 
     private void Start()
     {
@@ -133,7 +135,7 @@ public class ShapeCheckPos : MonoBehaviour
     }
 
     // Convert grid position → world position
-    private Vector3 GridToWorld(Vector2Int gridPos)
+    public Vector3 GridToWorld(Vector2Int gridPos)
     {
         return new Vector3(
             gridOriginWorld.x + gridPos.x * cellSize,

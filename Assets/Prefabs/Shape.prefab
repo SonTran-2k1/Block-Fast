@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1220144439150622922}
   - component: {fileID: 2362069017865283086}
   - component: {fileID: -4749704201466976586}
+  - component: {fileID: 8936266232948098157}
   m_Layer: 0
   m_Name: Shape
   m_TagString: Untagged
@@ -89,3 +90,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShapeCheckPos
   cellSize: 1.2
   snapDistance: 0.5
+  cellManager: {fileID: 0}
+--- !u!114 &8936266232948098157
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8948333056326208789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f841119fcd2b0d04ebd4c19c50d966e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnapShape
+  shapeCheckPos: {fileID: -4749704201466976586}
