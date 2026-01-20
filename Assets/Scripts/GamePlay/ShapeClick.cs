@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using DG.Tweening;
 
@@ -9,10 +10,12 @@ public class ShapeClick : MonoBehaviour
     private Vector3 originalPosition;
     private bool isDragging = false;
     private Tween returnTween;
+    private ShapeCheckPos shapeCheckPos;
 
     private void Start()
     {
         originalPosition = transform.position;
+        shapeCheckPos = GetComponent<ShapeCheckPos>();
     }
 
     // Update is called once per frame
@@ -29,7 +32,7 @@ public class ShapeClick : MonoBehaviour
                 {
                     Debug.Log("Clicked on " + gameObject.name);
                     isDragging = true;
-                    
+
                     // Kill return tween nếu đang chạy
                     returnTween?.Kill();
                 }
@@ -40,11 +43,24 @@ public class ShapeClick : MonoBehaviour
         {
             Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             transform.position = (Vector3)mousePos + (Vector3)dragOffset;
+            
+            // Gọi trực tiếp ShapeCheckPos trên cùng object
+            if (shapeCheckPos != null)
+            {
+                shapeCheckPos.CheckPositionAndHighlight(transform.position);
+            }
         }
 
         if (Input.GetMouseButtonUp(0) && isDragging)
         {
             isDragging = false;
+            
+            // Clear highlights khi buông
+            if (shapeCheckPos != null)
+            {
+                shapeCheckPos.ClearHighlights();
+            }
+
             // Return về vị trí ban đầu với DOTween
             returnTween = transform.DOMove(originalPosition, returnDuration);
         }
