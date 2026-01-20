@@ -24,8 +24,9 @@ public class ShapeSnap : MonoBehaviour
         if (!shapeCheckPos.CanPlaceShape(gridPos))
             return false;
 
-        Vector3 anchorWorldPos = shapeCheckPos.GridToWorld(gridPos);
-        snappedWorldPos = anchorWorldPos - shapeCheckPos.AnchorLocalOffset;
+        Vector3 anchorWorldPos = shapeCheckPos.GetCellWorldPosition(gridPos);
+        Vector3 anchorWorldOffset = shapeCheckPos.transform.TransformVector(shapeCheckPos.AnchorLocalOffset);
+        snappedWorldPos = anchorWorldPos - anchorWorldOffset;
         return true;
     }
 }

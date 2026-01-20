@@ -13,6 +13,7 @@ public class ShapeCheckPos : MonoBehaviour
     private Vector2Int gridSize = new Vector2Int(8, 8); // 8x8 grid
     private Vector2Int? currentHighlightedGrid; // Lưu vị trí highlight hiện tại
     private Vector3 anchorLocalOffset; // Local offset của anchor block (min corner)
+    private float shapeCellSize = 1f; // Kích thước ô theo local của shape
     public Vector3 AnchorLocalOffset => anchorLocalOffset; // Local offset của anchor block (min corner)
     public Vector2Int? CurrentHighlightedGrid => currentHighlightedGrid;
 
@@ -28,7 +29,7 @@ public class ShapeCheckPos : MonoBehaviour
     public void CheckPositionAndHighlight(Vector3 worldPos)
     {
         // Tính vị trí world của anchor block (block ở góc min)
-        Vector3 anchorWorldPos = worldPos + anchorLocalOffset;
+        Vector3 anchorWorldPos = worldPos + transform.TransformVector(anchorLocalOffset);
         Vector2Int? validGridPos = GetNearestSnappablePosition(anchorWorldPos);
 
         // Nếu vị trí mới khác vị trí cũ thì update highlight
@@ -58,11 +59,29 @@ public class ShapeCheckPos : MonoBehaviour
 
         float minX = cells[0].transform.position.x;
         float minY = cells[0].transform.position.y;
-        for (int i = 1; i < cells.Count; i++)
+        float minPositiveDx = float.MaxValue;
+        float minPositiveDy = float.MaxValue;
+
+        for (int i = 0; i < cells.Count; i++)
         {
-            Vector3 pos = cells[i].transform.position;
-            if (pos.x < minX) minX = pos.x;
-            if (pos.y < minY) minY = pos.y;
+            Vector3 posA = cells[i].transform.position;
+            if (posA.x < minX) minX = posA.x;
+            if (posA.y < minY) minY = posA.y;
+
+            for (int j = 0; j < cells.Count; j++)
+            {
+                if (i == j) continue;
+                Vector3 posB = cells[j].transform.position;
+                float dx = Mathf.Abs(posA.x - posB.x);
+                float dy = Mathf.Abs(posA.y - posB.y);
+                if (dx > 0.0001f && dx < minPositiveDx) minPositiveDx = dx;
+                if (dy > 0.0001f && dy < minPositiveDy) minPositiveDy = dy;
+            }
+        }
+
+        if (minPositiveDx < float.MaxValue && minPositiveDy < float.MaxValue)
+        {
+            cellSize = Mathf.Min(minPositiveDx, minPositiveDy);
         }
 
         gridOriginWorld = new Vector3(minX, minY, 0f);
@@ -82,9 +101,15 @@ public class ShapeCheckPos : MonoBehaviour
         {
             Vector3 localPos = child.localPosition;
             allLocalPositions.Add(localPos);
+        }
+
+        shapeCellSize = ComputeShapeCellSize(allLocalPositions);
+
+        foreach (Vector3 localPos in allLocalPositions)
+        {
             Vector2Int gridPos = new Vector2Int(
-                Mathf.RoundToInt(localPos.x / cellSize),
-                Mathf.RoundToInt(localPos.y / cellSize)
+                Mathf.RoundToInt(localPos.x / shapeCellSize),
+                Mathf.RoundToInt(localPos.y / shapeCellSize)
             );
             allGridPositions.Add(gridPos);
         }
@@ -125,6 +150,31 @@ public class ShapeCheckPos : MonoBehaviour
         shapePattern = pattern.ToArray();
     }
 
+    private float ComputeShapeCellSize(IReadOnlyList<Vector3> locals)
+    {
+        float minPositiveDx = float.MaxValue;
+        float minPositiveDy = float.MaxValue;
+
+        for (int i = 0; i < locals.Count; i++)
+        {
+            for (int j = 0; j < locals.Count; j++)
+            {
+                if (i == j) continue;
+                float dx = Mathf.Abs(locals[i].x - locals[j].x);
+                float dy = Mathf.Abs(locals[i].y - locals[j].y);
+                if (dx > 0.0001f && dx < minPositiveDx) minPositiveDx = dx;
+                if (dy > 0.0001f && dy < minPositiveDy) minPositiveDy = dy;
+            }
+        }
+
+        if (minPositiveDx == float.MaxValue && minPositiveDy == float.MaxValue)
+            return 1f;
+
+        if (minPositiveDx == float.MaxValue) return minPositiveDy;
+        if (minPositiveDy == float.MaxValue) return minPositiveDx;
+        return Mathf.Min(minPositiveDx, minPositiveDy);
+    }
+
     // Convert world position → grid position
     private Vector2Int WorldToGrid(Vector3 worldPos)
     {
@@ -162,7 +212,7 @@ public class ShapeCheckPos : MonoBehaviour
                 // Check xem shape có fit vào vị trí này không
                 if (CanPlaceShape(testGrid))
                 {
-                    Vector3 testWorldPos = GridToWorld(testGrid);
+                    Vector3 testWorldPos = GetCellWorldPosition(testGrid);
                     float distance = Vector3.Distance(worldPos, testWorldPos);
 
                     // Tìm vị trí gần nhất trong snap distance
@@ -266,5 +316,17 @@ public class ShapeCheckPos : MonoBehaviour
                 cell.GetComponent<SpriteRenderer>().color = Color.white;
             }
         }
+    }
+
+    public Vector3 GetCellWorldPosition(Vector2Int gridPos)
+    {
+        var cells = cellManager.GetCells();
+        Dictionary<Vector2Int, Cell> gridDict = BuildGridDictionary(cells);
+        if (gridDict.TryGetValue(gridPos, out Cell cell))
+        {
+            return cell.transform.position;
+        }
+
+        return GridToWorld(gridPos);
     }
 }
