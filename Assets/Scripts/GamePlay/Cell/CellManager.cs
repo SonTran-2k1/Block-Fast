@@ -1,7 +1,8 @@
 using System.Collections.Generic;
+using Core.Singleton;
 using UnityEngine;
 
-public class CellManager : MonoBehaviour
+public class CellManager : SingletonBase<CellManager>
 {
     [SerializeField] private List<Cell> listCell;
     private Cell[,] grid;

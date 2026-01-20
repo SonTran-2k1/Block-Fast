@@ -86,6 +86,13 @@ public class SpawnManager : MonoBehaviour
                 spriteRenderer.sprite = randomSprite;
             }
 
+            // Set shape pattern cho ShapeCheckPos
+            ShapeCheckPos shapeCheckPos = pieceRoot.GetComponent<ShapeCheckPos>();
+            if (shapeCheckPos != null)
+            {
+                shapeCheckPos.SetShapePattern(pieceRoot.transform);
+            }
+
             spawnedPieces.Add(pieceRoot);
         }
     }
