@@ -79,7 +79,7 @@ public class SpawnManager : MonoBehaviour
                 GameObject block = new GameObject($"Block_{cell.x}_{cell.y}");
                 block.transform.SetParent(pieceRoot.transform, false);
                 block.transform.localPosition = new Vector3(cell.x * 1.2f, cell.y * 1.2f, 0);
-                block.AddComponent<BoxCollider2D>().size = new Vector2(1.6f, 1.6f);
+                block.AddComponent<BoxCollider2D>().size = new Vector2(1.52f, 1.52f);
                 SpriteRenderer spriteRenderer = block.AddComponent<SpriteRenderer>();
                 spriteRenderer.sortingLayerName = "CellShape";
                 spriteRenderer.material = materialUnlit;
