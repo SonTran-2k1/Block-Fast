@@ -550,7 +550,7 @@ Transform:
   m_GameObject: {fileID: 693646815}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.059999943, y: -3.48, z: 0}
+  m_LocalPosition: {x: 0, y: -3.48, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -857,6 +857,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2036943830}
   - component: {fileID: 2036943831}
+  - component: {fileID: 2036943832}
   m_Layer: 0
   m_Name: SpawnManager
   m_TagString: Untagged
@@ -898,6 +899,8 @@ MonoBehaviour:
   - {fileID: 62709927}
   - {fileID: 693646816}
   - {fileID: 1128319837}
+  shapeClickPrefab: {fileID: 8948333056326208789, guid: e8620b7ffb57dad48b5b2c3f015bba03, type: 3}
+  materialUnlit: {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   piecesPerBatch: 3
   unitSpacing: 1
   autoSpawnOnStart: 1
@@ -912,9 +915,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c26346ad85724f94c83b9b945f786a13, type: 3}
   - {fileID: 21300000, guid: 5db978ef07b3e4444ac3d040958b2618, type: 3}
   - {fileID: 21300000, guid: f6df294d327fb7d4782be18c765b7117, type: 3}
+  SpaceShape: 0
   shapes:
   - id: 1
-    sprite: {fileID: 3567148443835635296, guid: ac5618e8647f09e42ba19ee9b84ed4e2, type: 3}
     cells:
     - {x: 0, y: 2}
     - {x: 0, y: 1}
@@ -922,7 +925,6 @@ MonoBehaviour:
     - {x: 1, y: 0}
     weight: 0
   - id: 2
-    sprite: {fileID: 3567148443835635296, guid: ac5618e8647f09e42ba19ee9b84ed4e2, type: 3}
     cells:
     - {x: 0, y: 2}
     - {x: 0, y: 1}
@@ -930,13 +932,29 @@ MonoBehaviour:
     - {x: 1, y: 0}
     weight: 0
   - id: 3
-    sprite: {fileID: 3567148443835635296, guid: ac5618e8647f09e42ba19ee9b84ed4e2, type: 3}
     cells:
     - {x: 0, y: 2}
     - {x: 0, y: 1}
     - {x: 0, y: 0}
     - {x: 1, y: 0}
     weight: 0
+--- !u!114 &2036943832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2036943829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7ab2fcd46aaa847b4fdb04263a8edf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TransformArranger
+  slot1: {fileID: 62709927}
+  slot2: {fileID: 693646816}
+  slot3: {fileID: 1128319837}
+  yPosition: -8.5
+  xSpacing: 3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

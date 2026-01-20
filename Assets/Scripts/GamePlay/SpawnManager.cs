@@ -15,6 +15,8 @@ public class SpawnManager : MonoBehaviour
     }
 
     [Header("Setup")] [SerializeField] private Transform[] spawnSlots;
+    [SerializeField] private GameObject shapeClickPrefab;
+    [SerializeField] private Material materialUnlit;
     [SerializeField] private int piecesPerBatch = 3;
     [SerializeField, Range(0.25f, 2f)] private float unitSpacing = 1f;
     [SerializeField] private bool autoSpawnOnStart = true;
@@ -49,13 +51,19 @@ public class SpawnManager : MonoBehaviour
             return;
         }
 
+        if (shapeClickPrefab == null)
+        {
+            Debug.LogError("[SpawnManager] ShapeClickPrefab is not assigned");
+            return;
+        }
+
         EnsureShapeCatalog();
 
         for (int i = 0; i < piecesPerBatch && i < spawnSlots.Length; i++)
         {
             Transform slot = spawnSlots[i];
-            GameObject pieceRoot = new GameObject($"Piece_{i}");
-            pieceRoot.transform.SetParent(slot, false);
+            GameObject pieceRoot = Instantiate(shapeClickPrefab, slot, false);
+            pieceRoot.name = $"Piece_{i}";
 
             // Pick a random shape
             BlockShape randomShape = shapes[rng.Next(shapes.Count)];
@@ -71,8 +79,10 @@ public class SpawnManager : MonoBehaviour
                 GameObject block = new GameObject($"Block_{cell.x}_{cell.y}");
                 block.transform.SetParent(pieceRoot.transform, false);
                 block.transform.localPosition = new Vector3(cell.x * 1.2f, cell.y * 1.2f, 0);
-
+                block.AddComponent<BoxCollider2D>().size = new Vector2(1.6f, 1.6f);
                 SpriteRenderer spriteRenderer = block.AddComponent<SpriteRenderer>();
+                spriteRenderer.sortingLayerName = "CellShape";
+                spriteRenderer.material = materialUnlit;
                 spriteRenderer.sprite = randomSprite;
             }
 
