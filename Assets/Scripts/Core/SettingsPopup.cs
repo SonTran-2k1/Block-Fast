@@ -86,26 +86,28 @@ public class SettingsPopup : PopupBase
     private void OnMusicToggled(bool enabled)
     {
         AudioManager.Instance.ToggleMusic(enabled);
-        AudioManager.Instance.PlaySFX("click");
+
+        //AudioManager.Instance.PlaySFX("click");
     }
 
     private void OnSFXToggled(bool enabled)
     {
         AudioManager.Instance.ToggleSFX(enabled);
-        if (enabled)
-            AudioManager.Instance.PlaySFX("click");
+
+        //if (enabled)
+        //AudioManager.Instance.PlaySFX("click");
     }
 
     private void OnCloseClicked()
     {
-        AudioManager.Instance.PlaySFX("click");
+        //AudioManager.Instance.PlaySFX("click");
         Hide();
         UIManager.Instance.HidePopup<SettingsPopup>();
     }
 
     private void OnResetClicked()
     {
-        AudioManager.Instance.PlaySFX("click");
+        //AudioManager.Instance.PlaySFX("click");
         AudioManager.Instance.SetMasterVolume(1f);
         AudioManager.Instance.SetMusicVolume(0.7f);
         AudioManager.Instance.SetSFXVolume(1f);

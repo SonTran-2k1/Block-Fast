@@ -1,4 +1,4 @@
-﻿﻿using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Core.UI;
 using Core.Managers;
@@ -47,7 +47,7 @@ namespace Game.UI
         /// </summary>
         private void OnResumeClicked()
         {
-            AudioManager.Instance.PlaySFX("click"); // Play click SFX if available
+            //AudioManager.Instance.PlaySFX("click"); // Play click SFX if available
             Hide();
             UIManager.Instance.HidePopup<PausePopup>();
         }
@@ -57,8 +57,9 @@ namespace Game.UI
         /// </summary>
         private void OnSettingsClicked()
         {
-            AudioManager.Instance.PlaySFX("click");
+            //AudioManager.Instance.PlaySFX("click");
             Debug.Log("[PausePopup] Settings clicked");
+
             // TODO: Show settings popup
         }
 
@@ -67,21 +68,24 @@ namespace Game.UI
         /// </summary>
         private void OnExitClicked()
         {
-            AudioManager.Instance.PlaySFX("click");
+            //AudioManager.Instance.PlaySFX("click");
             Debug.Log("[PausePopup] Exit clicked");
             UIManager.Instance.HideAllPopups();
+
             // TODO: Load main menu or close game
         }
 
         protected override void OnPopupShown()
         {
             Debug.Log("[PausePopup] Pause menu shown");
+
             // Pause game logic here if needed
         }
 
         protected override void OnPopupHidden()
         {
             Debug.Log("[PausePopup] Pause menu hidden");
+
             // Resume game logic here if needed
         }
 

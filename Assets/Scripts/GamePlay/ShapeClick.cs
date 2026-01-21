@@ -72,7 +72,11 @@ public class ShapeClick : MonoBehaviour
                         .OnComplete(() =>
                         {
                             // Sau khi snap animation xong, gán block vào cell
+                            int blockCount = GetBlockCount();
                             AssignBlocksToCells();
+
+                            // Add score cho blocks đã gán (không add combo ở đây)
+                            ScoreManager.Instance.AddBlockScore(blockCount);
 
                             // Kiểm tra và clear hàng/cột full
                             int clearedLines = CellManager.Instance.CheckAndClearFullLines();
@@ -81,8 +85,18 @@ public class ShapeClick : MonoBehaviour
                             {
                                 Debug.Log($"[ShapeClick] Cleared {clearedLines} lines! Score bonus!");
 
-                                // TODO: Thêm scoring system ở đây nếu cần
-                                AudioManager.Instance.PlaySFX("Clear1");
+                                //AudioManager.Instance.PlaySFX("Clear1");
+
+                                // Add score cho lines cleared
+                                ScoreManager.Instance.AddClearLineScore(clearedLines);
+
+                                // Tăng combo chỉ khi ăn được hàng/cột
+                                ComboManager.Instance.AddCombo();
+                            }
+                            else
+                            {
+                                // Nếu không ăn hàng/cột thì reset combo
+                                ComboManager.Instance.ResetCombo();
                             }
 
                             // Notify SpawnManager rằng shape đã được đặt
@@ -187,6 +201,18 @@ public class ShapeClick : MonoBehaviour
                 Debug.LogWarning($"[ShapeClick] No cell found at grid ({gridPos.x}, {gridPos.y}) for block '{block.name}'");
             }
         }
+    }
+
+    // Đếm số lượng blocks trong shape
+    private int GetBlockCount()
+    {
+        int count = 0;
+        foreach (Transform child in transform)
+        {
+            count++;
+        }
+
+        return count;
     }
 
     // Hàm utility: Lấy tất cả SpriteRenderer từ object cha và con, gán sortingOrder = 1
