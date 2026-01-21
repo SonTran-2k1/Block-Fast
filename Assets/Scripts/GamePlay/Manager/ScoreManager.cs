@@ -4,24 +4,29 @@ using UnityEngine;
 public class ScoreManager : SingletonBase<ScoreManager>
 {
     private int currentScore = 0;
-    
+
     // Event để UI subscribe
     public delegate void OnScoreChanged(int newScore);
+
     public event OnScoreChanged ScoreChanged;
 
-    public int CurrentScore => currentScore;
+    public int CurrentScore
+    {
+        get => currentScore;
+        set => currentScore = value;
+    }
 
     // Thêm điểm từ block kéo vào (1 block = 1 điểm * combo multiplier)
     public void AddBlockScore(int blockCount = 1)
     {
         int comboMultiplier = ComboManager.Instance.GetComboMultiplier();
         int scoreToAdd = blockCount * comboMultiplier;
-        
+
         currentScore += scoreToAdd;
-        
+
         Debug.Log($"[ScoreManager] Added {scoreToAdd} points ({blockCount} blocks × {comboMultiplier} combo). Total: {currentScore}");
         ScoreChanged?.Invoke(currentScore);
-        
+
         // Check best score khi thả shape xuống
         BestScoreManager.Instance.CheckAndUpdateBestScore(currentScore);
     }
@@ -31,12 +36,12 @@ public class ScoreManager : SingletonBase<ScoreManager>
     {
         int comboMultiplier = ComboManager.Instance.GetComboMultiplier();
         int scoreToAdd = lineCount * 8 * comboMultiplier; // 8 ô = 1 hàng/cột
-        
+
         currentScore += scoreToAdd;
-        
+
         Debug.Log($"[ScoreManager] Cleared {lineCount} lines! Added {scoreToAdd} points ({lineCount} × 8 × {comboMultiplier} combo). Total: {currentScore}");
         ScoreChanged?.Invoke(currentScore);
-        
+
         // Check best score
         BestScoreManager.Instance.CheckAndUpdateBestScore(currentScore);
     }

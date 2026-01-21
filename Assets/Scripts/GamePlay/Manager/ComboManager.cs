@@ -7,7 +7,11 @@ public class ComboManager : SingletonBase<ComboManager>
     private int currentCombo = 0;
     private const int MaxCombo = 9;
 
-    public int CurrentCombo => currentCombo;
+    public int CurrentCombo
+    {
+        get => currentCombo;
+        set => currentCombo = value;
+    }
 
     // Event khi combo thay đổi
     public delegate void OnComboChanged(int newCombo);

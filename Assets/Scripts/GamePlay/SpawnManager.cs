@@ -13,32 +13,32 @@ public class SpawnManager : SingletonBase<SpawnManager>
         [Range(1, 100)] public int weight = 10;
 
         public bool IsValid() => cells != null && cells.Length > 0;
-        
+
         // Normalize cells về anchor (0,0)
         public Vector2Int[] GetNormalizedCells()
         {
             if (cells == null || cells.Length == 0) return cells;
-            
+
             int minX = cells[0].x;
             int minY = cells[0].y;
-            
+
             foreach (var c in cells)
             {
                 if (c.x < minX) minX = c.x;
                 if (c.y < minY) minY = c.y;
             }
-            
+
             Vector2Int[] normalized = new Vector2Int[cells.Length];
             for (int i = 0; i < cells.Length; i++)
             {
                 normalized[i] = new Vector2Int(cells[i].x - minX, cells[i].y - minY);
             }
+
             return normalized;
         }
     }
 
-    [Header("Setup")] 
-    [SerializeField] private Transform[] spawnSlots;
+    [Header("Setup")] [SerializeField] private Transform[] spawnSlots;
     [SerializeField] private GameObject shapeClickPrefab;
     [SerializeField] private Material materialUnlit;
     [SerializeField] private int piecesPerBatch = 3;
@@ -54,7 +54,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
     // Current spawned pieces tracking
     private readonly List<GameObject> currentBatchPieces = new List<GameObject>();
     private int piecesPlacedInBatch = 0;
-    
+
     private System.Random rng;
 
     protected override void Awake()
@@ -70,21 +70,21 @@ public class SpawnManager : SingletonBase<SpawnManager>
             SpawnBatch();
         }
     }
-    
+
     // Gọi khi một shape được đặt xuống grid
     public void OnShapePlaced(GameObject placedShape)
     {
         currentBatchPieces.Remove(placedShape);
         piecesPlacedInBatch++;
-        
+
         Debug.Log($"[SpawnManager] Shape placed. Remaining: {currentBatchPieces.Count}, Placed this batch: {piecesPlacedInBatch}");
-        
+
         // Kiểm tra các shapes còn lại có fit không
         if (currentBatchPieces.Count > 0)
         {
             CheckRemainingShapesCanFit();
         }
-        
+
         // Nếu đã thả hết 3 shapes thì spawn batch mới
         if (currentBatchPieces.Count == 0)
         {
@@ -93,20 +93,20 @@ public class SpawnManager : SingletonBase<SpawnManager>
             SpawnBatch();
         }
     }
-    
+
     // Kiểm tra các shapes còn lại có thể đặt vào grid không
     private void CheckRemainingShapesCanFit()
     {
         CellManager cellManager = CellManager.Instance;
         bool anyCanFit = false;
-        
+
         foreach (GameObject piece in currentBatchPieces)
         {
             if (piece == null) continue;
-            
+
             ShapeCheckPos shapeCheckPos = piece.GetComponent<ShapeCheckPos>();
             if (shapeCheckPos == null) continue;
-            
+
             Vector2Int[] pattern = shapeCheckPos.GetShapePattern();
             if (cellManager.CanShapeFitAnywhere(pattern))
             {
@@ -114,10 +114,11 @@ public class SpawnManager : SingletonBase<SpawnManager>
                 break;
             }
         }
-        
+
         if (!anyCanFit)
         {
             Debug.LogError("[SpawnManager] GAME OVER! Không còn shape nào có thể đặt vào grid!");
+
             // TODO: Trigger Game Over UI
         }
     }
@@ -129,6 +130,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
         {
             if (piece != null) Destroy(piece);
         }
+
         currentBatchPieces.Clear();
         piecesPlacedInBatch = 0;
 
@@ -145,18 +147,18 @@ public class SpawnManager : SingletonBase<SpawnManager>
         }
 
         EnsureShapeCatalog();
-        
+
         // Tìm các shapes có thể fit vào grid
         List<BlockShape> fittingShapes = FindShapesThatFit();
-        
+
         if (fittingShapes.Count == 0)
         {
             Debug.LogError("[SpawnManager] GAME OVER! Không có shape nào fit vào grid!");
             return;
         }
-        
+
         Debug.Log($"[SpawnManager] Found {fittingShapes.Count} shapes that can fit on grid");
-        
+
         // Chọn shapes cho batch này
         List<BlockShape> selectedShapes = SelectShapesForBatch(fittingShapes);
 
@@ -195,16 +197,16 @@ public class SpawnManager : SingletonBase<SpawnManager>
 
             currentBatchPieces.Add(pieceRoot);
         }
-        
+
         Debug.Log($"[SpawnManager] Spawned {currentBatchPieces.Count} pieces");
     }
-    
+
     // Tìm tất cả shapes có thể fit vào grid hiện tại
     private List<BlockShape> FindShapesThatFit()
     {
         List<BlockShape> fittingShapes = new List<BlockShape>();
         CellManager cellManager = CellManager.Instance;
-        
+
         foreach (BlockShape shape in shapes)
         {
             Vector2Int[] normalizedCells = shape.GetNormalizedCells();
@@ -213,56 +215,57 @@ public class SpawnManager : SingletonBase<SpawnManager>
                 fittingShapes.Add(shape);
             }
         }
-        
+
         return fittingShapes;
     }
-    
+
     // Chọn shapes cho batch - đảm bảo có ít nhất shapes có thể fit
     private List<BlockShape> SelectShapesForBatch(List<BlockShape> fittingShapes)
     {
         List<BlockShape> selected = new List<BlockShape>();
-        
+
         // Số shapes fit cần chọn (tối thiểu 1, tối đa là số shapes fit có sẵn hoặc piecesPerBatch)
         int guaranteedFitCount = Mathf.Min(2, fittingShapes.Count, piecesPerBatch);
-        
+
         // Random chọn các shapes fit (weighted)
         List<BlockShape> availableFitting = new List<BlockShape>(fittingShapes);
-        
+
         for (int i = 0; i < guaranteedFitCount && availableFitting.Count > 0; i++)
         {
             BlockShape chosen = WeightedRandomSelect(availableFitting);
             selected.Add(chosen);
+
             // Có thể chọn lại shape cùng loại nên không remove
         }
-        
+
         // Fill còn lại với random từ fitting shapes (vì chỉ có shapes fit mới được spawn)
         while (selected.Count < piecesPerBatch && fittingShapes.Count > 0)
         {
             BlockShape chosen = WeightedRandomSelect(fittingShapes);
             selected.Add(chosen);
         }
-        
+
         // Shuffle để không phải lúc nào shapes fit cũng ở đầu
         ShuffleList(selected);
-        
+
         return selected;
     }
-    
+
     // Weighted random selection
     private BlockShape WeightedRandomSelect(List<BlockShape> shapeList)
     {
         if (shapeList.Count == 0) return null;
         if (shapeList.Count == 1) return shapeList[0];
-        
+
         int totalWeight = 0;
         foreach (var shape in shapeList)
         {
             totalWeight += shape.weight;
         }
-        
+
         int randomValue = rng.Next(totalWeight);
         int cumulative = 0;
-        
+
         foreach (var shape in shapeList)
         {
             cumulative += shape.weight;
@@ -271,10 +274,10 @@ public class SpawnManager : SingletonBase<SpawnManager>
                 return shape;
             }
         }
-        
+
         return shapeList[shapeList.Count - 1];
     }
-    
+
     // Fisher-Yates shuffle
     private void ShuffleList<T>(List<T> list)
     {
