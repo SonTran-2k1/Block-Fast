@@ -18,8 +18,14 @@ public class Cell : MonoBehaviour
     {
         if (occupyingBlock != null)
         {
-            Destroy(occupyingBlock);
-            occupyingBlock = null;
+            Debug.Log($"[Cell] Clearing block '{occupyingBlock.name}' from cell '{gameObject.name}'");
+            GameObject blockToDestroy = occupyingBlock;
+            occupyingBlock = null; // Set null TRƯỚC khi destroy
+            Destroy(blockToDestroy);
+        }
+        else
+        {
+            Debug.Log($"[Cell] ClearBlock called on '{gameObject.name}' but no block to clear");
         }
         
         if (blockRenderer != null)

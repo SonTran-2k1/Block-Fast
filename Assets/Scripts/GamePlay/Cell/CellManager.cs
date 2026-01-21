@@ -93,15 +93,39 @@ public class CellManager : SingletonBase<CellManager>
     // Trả về số hàng/cột đã clear (để tính score)
     public int CheckAndClearFullLines()
     {
-        if (gridDict == null) BuildGridDictionary();
+        if (gridDict == null || gridDict.Count == 0) BuildGridDictionary();
         
+        // Collect tất cả cells cần clear (để tránh clear trùng)
+        HashSet<Vector2Int> cellsToClear = new HashSet<Vector2Int>();
         List<int> fullRows = new List<int>();
         List<int> fullCols = new List<int>();
+        
+        // Debug: In ra trạng thái toàn bộ grid
+        Debug.Log("[CellManager] === GRID STATE ===");
+        for (int y = GridSize - 1; y >= 0; y--) // In từ trên xuống
+        {
+            string rowState = $"Row {y}: ";
+            for (int x = 0; x < GridSize; x++)
+            {
+                Vector2Int pos = new Vector2Int(x, y);
+                if (gridDict.TryGetValue(pos, out Cell cell))
+                {
+                    rowState += cell.HasBlock() ? "■" : "□";
+                }
+                else
+                {
+                    rowState += "X";
+                }
+            }
+            Debug.Log($"[CellManager] {rowState}");
+        }
+        Debug.Log("[CellManager] =================");
         
         // Check các hàng (row - cùng y)
         for (int y = 0; y < GridSize; y++)
         {
             bool rowFull = true;
+            
             for (int x = 0; x < GridSize; x++)
             {
                 Vector2Int pos = new Vector2Int(x, y);
@@ -111,7 +135,17 @@ public class CellManager : SingletonBase<CellManager>
                     break;
                 }
             }
-            if (rowFull) fullRows.Add(y);
+            
+            if (rowFull)
+            {
+                fullRows.Add(y);
+                Debug.Log($"[CellManager] Row {y} is FULL! Adding to clear list.");
+                // Collect cells của row này
+                for (int x = 0; x < GridSize; x++)
+                {
+                    cellsToClear.Add(new Vector2Int(x, y));
+                }
+            }
         }
         
         // Check các cột (column - cùng x)
@@ -127,32 +161,44 @@ public class CellManager : SingletonBase<CellManager>
                     break;
                 }
             }
-            if (colFull) fullCols.Add(x);
+            if (colFull)
+            {
+                fullCols.Add(x);
+                Debug.Log($"[CellManager] Column {x} is FULL!");
+                // Collect cells của column này
+                for (int y = 0; y < GridSize; y++)
+                {
+                    cellsToClear.Add(new Vector2Int(x, y));
+                }
+            }
         }
         
-        // Clear các hàng full
-        foreach (int row in fullRows)
+        // Clear tất cả cells đã collect (mỗi cell chỉ clear 1 lần)
+        Debug.Log($"[CellManager] Clearing {cellsToClear.Count} cells...");
+        foreach (Vector2Int pos in cellsToClear)
         {
-            ClearRow(row);
-        }
-        
-        // Clear các cột full
-        foreach (int col in fullCols)
-        {
-            ClearColumn(col);
+            if (gridDict.TryGetValue(pos, out Cell cell))
+            {
+                Debug.Log($"[CellManager] Clearing cell at ({pos.x}, {pos.y}), HasBlock: {cell.HasBlock()}");
+                cell.ClearBlock();
+            }
+            else
+            {
+                Debug.LogWarning($"[CellManager] Cell at ({pos.x}, {pos.y}) not found in gridDict!");
+            }
         }
         
         int totalCleared = fullRows.Count + fullCols.Count;
         
         if (totalCleared > 0)
         {
-            Debug.Log($"[CellManager] Cleared {fullRows.Count} rows and {fullCols.Count} columns!");
+            Debug.Log($"[CellManager] Cleared {fullRows.Count} rows and {fullCols.Count} columns! ({cellsToClear.Count} cells total)");
         }
         
         return totalCleared;
     }
     
-    // Clear toàn bộ một hàng
+    // Clear toàn bộ một hàng (kept for backward compatibility)
     private void ClearRow(int row)
     {
         for (int x = 0; x < GridSize; x++)

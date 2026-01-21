@@ -19,6 +19,9 @@ public class ShapeCheckPos : MonoBehaviour
     
     // Getter cho shape pattern để ShapeClick có thể access
     public Vector2Int[] GetShapePattern() => shapePattern;
+    
+    // Getter cho shapeCellSize
+    public float GetShapeCellSize() => shapeCellSize;
 
     private void Start()
     {

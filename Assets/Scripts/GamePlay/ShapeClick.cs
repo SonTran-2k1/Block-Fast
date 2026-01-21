@@ -37,6 +37,7 @@ public class ShapeClick : MonoBehaviour
                     Debug.Log("Clicked on " + gameObject.name);
                     isDragging = true;
                     AudioManager.Instance.PlaySFX("Select");
+                    SetSortingOrderForAllSprites(hit.collider.transform.parent.gameObject, 1);
 
                     // Kill return tween nếu đang chạy
                     returnTween?.Kill();
@@ -72,6 +73,7 @@ public class ShapeClick : MonoBehaviour
                         {
                             // Sau khi snap animation xong, gán block vào cell
                             AssignBlocksToCells();
+                            SetSortingOrderForAllSprites(gameObject, 0);
 
                             // Kiểm tra và clear hàng/cột full
                             int clearedLines = CellManager.Instance.CheckAndClearFullLines();
@@ -83,7 +85,7 @@ public class ShapeClick : MonoBehaviour
                                 // TODO: Thêm scoring system ở đây nếu cần
                                 AudioManager.Instance.PlaySFX("Clear1");
                             }
-                            
+
                             // Notify SpawnManager rằng shape đã được đặt
                             SpawnManager.Instance.OnShapePlaced(gameObject);
 
@@ -110,12 +112,15 @@ public class ShapeClick : MonoBehaviour
     private void AssignBlocksToCells()
     {
         if (shapeCheckPos == null || !shapeCheckPos.CurrentHighlightedGrid.HasValue)
+        {
+            Debug.LogError("[ShapeClick] Cannot assign blocks - no highlighted grid!");
             return;
+        }
 
         Vector2Int anchorGridPos = shapeCheckPos.CurrentHighlightedGrid.Value;
         CellManager cellManager = CellManager.Instance;
 
-        // Lấy tất cả children blocks
+        // Lấy tất cả children blocks và local positions
         List<Transform> blockChildren = new List<Transform>();
         foreach (Transform child in transform)
         {
@@ -124,34 +129,78 @@ public class ShapeClick : MonoBehaviour
 
         // Lấy shape pattern để biết offset của mỗi block
         Vector2Int[] pattern = shapeCheckPos.GetShapePattern();
+        float shapeCellSize = shapeCheckPos.GetShapeCellSize();
 
-        if (pattern == null || pattern.Length != blockChildren.Count)
+        if (pattern == null || pattern.Length == 0)
         {
-            Debug.LogWarning("[ShapeClick] Pattern và số block children không khớp!");
+            Debug.LogWarning("[ShapeClick] Pattern is null or empty!");
             return;
         }
 
-        // Gán từng block vào cell tương ứng
-        for (int i = 0; i < blockChildren.Count && i < pattern.Length; i++)
+        Debug.Log($"[ShapeClick] Assigning {blockChildren.Count} blocks to cells. Anchor: ({anchorGridPos.x}, {anchorGridPos.y})");
+
+        // Gán từng block dựa trên local position của nó
+        foreach (Transform block in blockChildren)
         {
-            Vector2Int gridPos = anchorGridPos + pattern[i];
+            // Tính grid offset của block này từ local position
+            Vector3 localPos = block.localPosition;
+            Vector2Int blockOffset = new Vector2Int(
+                Mathf.RoundToInt(localPos.x / shapeCellSize),
+                Mathf.RoundToInt(localPos.y / shapeCellSize)
+            );
+
+            // Normalize offset (trừ đi min để về gốc 0,0)
+            Vector2Int minOffset = pattern[0];
+            foreach (var p in pattern)
+            {
+                if (p.x < minOffset.x || (p.x == minOffset.x && p.y < minOffset.y))
+                    minOffset = p;
+            }
+
+            // Tìm xem blockOffset match với pattern nào
+            Vector2Int normalizedBlockOffset = new Vector2Int(
+                Mathf.RoundToInt(localPos.x / shapeCellSize) - Mathf.RoundToInt(shapeCheckPos.AnchorLocalOffset.x / shapeCellSize),
+                Mathf.RoundToInt(localPos.y / shapeCellSize) - Mathf.RoundToInt(shapeCheckPos.AnchorLocalOffset.y / shapeCellSize)
+            );
+
+            Vector2Int gridPos = anchorGridPos + normalizedBlockOffset;
             Cell targetCell = cellManager.GetCellAt(gridPos);
 
             if (targetCell != null)
             {
                 // Detach block khỏi parent trước
-                Transform block = blockChildren[i];
                 block.SetParent(null);
 
                 // Gán block vào cell
                 targetCell.SetOccupyingBlock(block.gameObject);
 
-                Debug.Log($"[ShapeClick] Assigned block to cell at grid ({gridPos.x}, {gridPos.y})");
+                Debug.Log($"[ShapeClick] Assigned block '{block.name}' to cell at grid ({gridPos.x}, {gridPos.y})");
             }
             else
             {
-                Debug.LogWarning($"[ShapeClick] No cell found at grid ({gridPos.x}, {gridPos.y})");
+                Debug.LogWarning($"[ShapeClick] No cell found at grid ({gridPos.x}, {gridPos.y}) for block '{block.name}'");
             }
+        }
+    }
+
+    // Hàm utility: Lấy tất cả SpriteRenderer từ object cha và con, gán sortingOrder = 1
+    public static void SetSortingOrderForAllSprites(GameObject parentObject, int sortingOrder = 1)
+    {
+        if (parentObject == null)
+        {
+            Debug.LogError("[ShapeClick] Parent object is null!");
+            return;
+        }
+
+        // Lấy tất cả SpriteRenderer từ parent và các con của nó
+        SpriteRenderer[] allSpriteRenderers = parentObject.GetComponentsInChildren<SpriteRenderer>();
+
+        //Debug.LogError($"[ShapeClick] Found {allSpriteRenderers.Length} SpriteRenderers in '{parentObject.name}' and its children");
+
+        foreach (SpriteRenderer spriteRenderer in allSpriteRenderers)
+        {
+            spriteRenderer.sortingOrder = sortingOrder;
+            Debug.Log($"[ShapeClick] Set sortingOrder = {sortingOrder} for '{spriteRenderer.gameObject.name}'");
         }
     }
 }
