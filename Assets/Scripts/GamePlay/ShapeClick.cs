@@ -73,7 +73,6 @@ public class ShapeClick : MonoBehaviour
                         {
                             // Sau khi snap animation xong, gán block vào cell
                             AssignBlocksToCells();
-                            SetSortingOrderForAllSprites(gameObject, 0);
 
                             // Kiểm tra và clear hàng/cột full
                             int clearedLines = CellManager.Instance.CheckAndClearFullLines();
@@ -170,6 +169,13 @@ public class ShapeClick : MonoBehaviour
             {
                 // Detach block khỏi parent trước
                 block.SetParent(null);
+
+                // Set sortingOrder = 0 cho block này (bây giờ nó không còn con của shape parent)
+                SpriteRenderer[] blockSprites = block.GetComponentsInChildren<SpriteRenderer>();
+                foreach (SpriteRenderer sprite in blockSprites)
+                {
+                    sprite.sortingOrder = 0;
+                }
 
                 // Gán block vào cell
                 targetCell.SetOccupyingBlock(block.gameObject);
