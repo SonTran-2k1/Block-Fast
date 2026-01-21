@@ -7,9 +7,10 @@ public class BestScoreManager : SingletonBase<BestScoreManager>
     private int bestScore = 0;
 
     public int BestScore => bestScore;
-    
+
     // Event khi best score update
     public delegate void OnBestScoreUpdated(int newBestScore);
+
     public event OnBestScoreUpdated BestScoreUpdated;
 
     protected override void Awake()
@@ -22,7 +23,8 @@ public class BestScoreManager : SingletonBase<BestScoreManager>
     private void LoadBestScore()
     {
         bestScore = PlayerPrefs.GetInt(BestScoreKey, 0);
-        Debug.Log($"[BestScoreManager] Loaded best score: {bestScore}");
+
+        //Debug.Log($"[BestScoreManager] Loaded best score: {bestScore}");
     }
 
     // Check và update best score nếu current score cao hơn
@@ -33,8 +35,8 @@ public class BestScoreManager : SingletonBase<BestScoreManager>
             bestScore = currentScore;
             PlayerPrefs.SetInt(BestScoreKey, bestScore);
             PlayerPrefs.Save();
-            
-            Debug.Log($"[BestScoreManager] New best score! {bestScore}");
+
+            //Debug.Log($"[BestScoreManager] New best score! {bestScore}");
             BestScoreUpdated?.Invoke(bestScore);
         }
     }

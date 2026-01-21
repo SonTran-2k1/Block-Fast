@@ -100,7 +100,7 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
                         }
                     });
             }
-            
+
             // Scale animation cho X image
             if (XImage != null)
             {
@@ -199,7 +199,7 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
         {
             comboImage.gameObject.SetActive(show);
         }
-        
+
         if (XImage != null)
         {
             XImage.gameObject.SetActive(show);
@@ -255,7 +255,7 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
         Debug.Log("[UIGamePlayManager] Combo reset - Fade out!");
     }
 
-    private void OnDestroy()
+    protected void OnDestroy()
     {
         // Kill all tweens
         comboScaleTween?.Kill();

@@ -100,7 +100,7 @@ public class GameFileManager : SingletonBase<GameFileManager>
                 // Chỉ log nếu cell có block
                 if (!string.IsNullOrEmpty(spriteName))
                 {
-                    Debug.Log($"[GameFileManager] Cell ({gridPos.x}, {gridPos.y}): Saving sprite '{cellData.spriteName}'");
+                    //Debug.Log($"[GameFileManager] Cell ({gridPos.x}, {gridPos.y}): Saving sprite '{cellData.spriteName}'");
                 }
 
                 gameData.gridCells.Add(cellData);
@@ -118,12 +118,12 @@ public class GameFileManager : SingletonBase<GameFileManager>
             // Ghi vào file
             File.WriteAllText(savePath, json);
 
-            Debug.Log($"[GameFileManager] Game saved successfully! Path: {savePath}");
-            Debug.Log($"[GameFileManager] Saved {gameData.gridCells.Count} cells, Score: {gameData.score}, Combo: {gameData.combo}");
+            //Debug.Log($"[GameFileManager] Game saved successfully! Path: {savePath}");
+            //Debug.Log($"[GameFileManager] Saved {gameData.gridCells.Count} cells, Score: {gameData.score}, Combo: {gameData.combo}");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"[GameFileManager] Failed to save game: {e.Message}");
+            //Debug.LogError($"[GameFileManager] Failed to save game: {e.Message}");
         }
     }
 
@@ -136,7 +136,7 @@ public class GameFileManager : SingletonBase<GameFileManager>
         {
             if (!File.Exists(savePath))
             {
-                Debug.Log("[GameFileManager] No save file found!");
+                //Debug.Log("[GameFileManager] No save file found!");
                 return false;
             }
 
@@ -145,7 +145,7 @@ public class GameFileManager : SingletonBase<GameFileManager>
 
             if (gameData == null)
             {
-                Debug.LogError("[GameFileManager] Failed to deserialize game data!");
+                //Debug.LogError("[GameFileManager] Failed to deserialize game data!");
                 return false;
             }
 
@@ -156,12 +156,12 @@ public class GameFileManager : SingletonBase<GameFileManager>
             ScoreManager.Instance.CurrentScore = gameData.score;
             ComboManager.Instance.CurrentCombo = gameData.combo;
 
-            Debug.Log($"[GameFileManager] Game loaded! Score: {gameData.score}, Combo: {gameData.combo}, Cells: {gameData.gridCells.Count}");
+            //Debug.Log($"[GameFileManager] Game loaded! Score: {gameData.score}, Combo: {gameData.combo}, Cells: {gameData.gridCells.Count}");
             return true;
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"[GameFileManager] Failed to load game: {e.Message}");
+            //Debug.LogError($"[GameFileManager] Failed to load game: {e.Message}");
             return false;
         }
     }
@@ -175,13 +175,14 @@ public class GameFileManager : SingletonBase<GameFileManager>
 
         if (cellManager == null)
         {
-            Debug.LogError("[GameFileManager] CellManager.Instance is NULL! Cannot restore cells.");
+            //Debug.LogError("[GameFileManager] CellManager.Instance is NULL! Cannot restore cells.");
             return;
         }
 
         List<Cell> allCells = cellManager.GetCells();
-        Debug.Log($"[GameFileManager] CellManager has {allCells.Count} cells available");
-        Debug.Log($"[GameFileManager] Sprite lookup has {spriteLookup.Count} sprites");
+
+        //Debug.Log($"[GameFileManager] CellManager has {allCells.Count} cells available");
+        //Debug.Log($"[GameFileManager] Sprite lookup has {spriteLookup.Count} sprites");
 
         int restoredCount = 0;
         int cellsWithSprite = 0;
@@ -198,7 +199,7 @@ public class GameFileManager : SingletonBase<GameFileManager>
 
             if (cell == null)
             {
-                Debug.LogWarning($"[GameFileManager] Cell at ({cellData.gridX}, {cellData.gridY}) is NULL!");
+                //Debug.LogWarning($"[GameFileManager] Cell at ({cellData.gridX}, {cellData.gridY}) is NULL!");
                 continue;
             }
 
@@ -218,12 +219,12 @@ public class GameFileManager : SingletonBase<GameFileManager>
                     sr.sortingOrder = 0;
                     cell.SetOccupyingBlock(block);
 
-                    Debug.Log($"[GameFileManager] Cell ({cellData.gridX}, {cellData.gridY}): Restored sprite '{cellData.spriteName}'");
+                    //Debug.Log($"[GameFileManager] Cell ({cellData.gridX}, {cellData.gridY}): Restored sprite '{cellData.spriteName}'");
                     restoredCount++;
                 }
                 else
                 {
-                    Debug.LogWarning($"[GameFileManager] Could not find sprite '{cellData.spriteName}' in spriteLookup. Available: {string.Join(", ", spriteLookup.Keys)}");
+                    //Debug.LogWarning($"[GameFileManager] Could not find sprite '{cellData.spriteName}' in spriteLookup. Available: {string.Join(", ", spriteLookup.Keys)}");
                 }
             }
             else
@@ -233,7 +234,7 @@ public class GameFileManager : SingletonBase<GameFileManager>
             }
         }
 
-        Debug.Log($"[GameFileManager] Grid cells restoration completed! Restored {restoredCount}/{cellsWithSprite} cells with sprites");
+        //Debug.Log($"[GameFileManager] Grid cells restoration completed! Restored {restoredCount}/{cellsWithSprite} cells with sprites");
     }
 
     /// <summary>
@@ -254,12 +255,13 @@ public class GameFileManager : SingletonBase<GameFileManager>
             if (File.Exists(savePath))
             {
                 File.Delete(savePath);
-                Debug.Log("[GameFileManager] Save file deleted!");
+
+                //Debug.Log("[GameFileManager] Save file deleted!");
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"[GameFileManager] Failed to delete save file: {e.Message}");
+            //Debug.LogError($"[GameFileManager] Failed to delete save file: {e.Message}");
         }
     }
 

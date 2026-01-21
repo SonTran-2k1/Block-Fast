@@ -2593,7 +2593,7 @@ MonoBehaviour:
   slot2: {fileID: 693646816}
   slot3: {fileID: 1128319837}
   yPosition: -8.5
-  xSpacing: 3.65
+  xSpacing: 4
 --- !u!1 &2082888794
 GameObject:
   m_ObjectHideFlags: 0

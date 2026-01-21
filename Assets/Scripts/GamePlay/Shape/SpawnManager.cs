@@ -86,7 +86,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
         currentBatchPieces.Remove(placedShape);
         piecesPlacedInBatch++;
 
-        Debug.Log($"[SpawnManager] Shape placed. Remaining: {currentBatchPieces.Count}, Placed this batch: {piecesPlacedInBatch}");
+        //Debug.Log($"[SpawnManager] Shape placed. Remaining: {currentBatchPieces.Count}, Placed this batch: {piecesPlacedInBatch}");
 
         // Kiểm tra các shapes còn lại có fit không
         if (currentBatchPieces.Count > 0)
@@ -97,7 +97,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
         // Nếu đã thả hết 3 shapes thì spawn batch mới
         if (currentBatchPieces.Count == 0)
         {
-            Debug.Log("[SpawnManager] All shapes placed! Spawning new batch...");
+            //Debug.Log("[SpawnManager] All shapes placed! Spawning new batch...");
             piecesPlacedInBatch = 0;
             SpawnBatch();
         }
@@ -134,7 +134,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
     {
         if (isGameOver)
         {
-            Debug.LogWarning("[SpawnManager] SpawnBatch called after game over. Ignoring.");
+            //Debug.LogWarning("[SpawnManager] SpawnBatch called after game over. Ignoring.");
             return;
         }
 
@@ -149,13 +149,13 @@ public class SpawnManager : SingletonBase<SpawnManager>
 
         if (spawnSlots == null || spawnSlots.Length == 0)
         {
-            Debug.LogError("[SpawnManager] Spawn slots are not set");
+            //Debug.LogError("[SpawnManager] Spawn slots are not set");
             return;
         }
 
         if (shapeClickPrefab == null)
         {
-            Debug.LogError("[SpawnManager] ShapeClickPrefab is not assigned");
+            //Debug.LogError("[SpawnManager] ShapeClickPrefab is not assigned");
             return;
         }
 
@@ -170,7 +170,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
             return;
         }
 
-        Debug.Log($"[SpawnManager] Found {fittingShapes.Count} shapes that can fit on grid");
+        //Debug.Log($"[SpawnManager] Found {fittingShapes.Count} shapes that can fit on grid");
 
         // Chọn shapes cho batch này
         List<BlockShape> selectedShapes = SelectShapesForBatch(fittingShapes);
@@ -211,7 +211,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
             currentBatchPieces.Add(pieceRoot);
         }
 
-        Debug.Log($"[SpawnManager] Spawned {currentBatchPieces.Count} pieces");
+        //Debug.Log($"[SpawnManager] Spawned {currentBatchPieces.Count} pieces");
     }
 
     // Tìm tất cả shapes có thể fit vào grid hiện tại
@@ -273,7 +273,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
         // Shuffle để không phải lúc nào shapes fit cũng ở đầu
         ShuffleList(selected);
 
-        Debug.Log($"[SpawnManager] Selected batch: {string.Join(", ", selected.Select(s => s.id))}");
+        //Debug.Log($"[SpawnManager] Selected batch: {string.Join(", ", selected.Select(s => s.id))}");
 
         return selected;
     }
@@ -286,7 +286,8 @@ public class SpawnManager : SingletonBase<SpawnManager>
         }
 
         isGameOver = true;
-        Debug.LogError($"[SpawnManager] GAME OVER! {reason}");
+
+        //Debug.LogError($"[SpawnManager] GAME OVER! {reason}");
         GameOverDetected?.Invoke();
     }
 
