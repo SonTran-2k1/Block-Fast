@@ -863,6 +863,7 @@ MonoBehaviour:
   cellManager: {fileID: 1915507081}
   gridSize: 8
   cellSize: 1
+  gridOriginWorld: {x: 0, y: 0, z: 0}
 --- !u!1 &2036943829
 GameObject:
   m_ObjectHideFlags: 0
@@ -942,10 +943,10 @@ MonoBehaviour:
     weight: 0
   - id: 2
     cells:
-    - {x: 0, y: 2}
     - {x: 0, y: 1}
     - {x: 0, y: 0}
     - {x: 1, y: 0}
+    - {x: 2, y: 0}
     weight: 0
   - id: 3
     cells:
@@ -971,6 +972,91 @@ MonoBehaviour:
   slot3: {fileID: 1128319837}
   yPosition: -8.5
   xSpacing: 3
+--- !u!1 &2082888794
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2082888796}
+  - component: {fileID: 2082888795}
+  m_Layer: 0
+  m_Name: MusicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2082888795
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082888794}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25205964e58597645a1e2bc6ece8ac09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Core.Managers.AudioManager
+  musicClips:
+  - clipName: Clear1
+    clip: {fileID: 8300000, guid: d422265f2cbba8440a0e79c745df0104, type: 3}
+    volume: 1
+  sfxClips:
+  - clipName: Clear1
+    clip: {fileID: 8300000, guid: d422265f2cbba8440a0e79c745df0104, type: 3}
+    volume: 1
+  - clipName: Clear2
+    clip: {fileID: 8300000, guid: 9931788997aef3944a78412c07e0d34c, type: 3}
+    volume: 1
+  - clipName: Clear3
+    clip: {fileID: 8300000, guid: f6a429ba69ffacb4b96fe8b44a8d488b, type: 3}
+    volume: 1
+  - clipName: Clear4
+    clip: {fileID: 8300000, guid: 3e545ab3cb8c88e4b9b1ad7a2b0ed097, type: 3}
+    volume: 1
+  - clipName: Clear5
+    clip: {fileID: 8300000, guid: a23d6854c1014204db566b9841cd4147, type: 3}
+    volume: 1
+  - clipName: Clear6
+    clip: {fileID: 8300000, guid: d8a0785bdab73ee4e84c75eecb660847, type: 3}
+    volume: 1
+  - clipName: Clear7
+    clip: {fileID: 8300000, guid: 47a07a4ddb38495499598b6027f2a611, type: 3}
+    volume: 1
+  - clipName: Clear8
+    clip: {fileID: 8300000, guid: 9e44c07ecff86a14ca758018127979cf, type: 3}
+    volume: 1
+  - clipName: Clear9
+    clip: {fileID: 8300000, guid: 8efcf584bd5085347a4552384f973ad2, type: 3}
+    volume: 1
+  - clipName: Drop
+    clip: {fileID: 8300000, guid: 5e24ac2df3bcb294ca4a522fc07759a3, type: 3}
+    volume: 1
+  - clipName: Select
+    clip: {fileID: 8300000, guid: a16ee67a33e0ed14ebbbb41653d1b440, type: 3}
+    volume: 1
+  masterVolume: 1
+  musicVolume: 0.7
+  sfxVolume: 1
+--- !u!4 &2082888796
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082888794}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -981,3 +1067,4 @@ SceneRoots:
   - {fileID: 262558356}
   - {fileID: 1915507079}
   - {fileID: 2036943830}
+  - {fileID: 2082888796}
