@@ -9,8 +9,7 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
     [Header("Score Display")] [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI bestScoreText;
 
-    [Header("Combo Display")] [SerializeField] private Image comboProgressFill;
-    [SerializeField] private Image comboImage; // Image nền combo
+    [Header("Combo Display")] [SerializeField] private Image comboImage; // Image nền combo
     [SerializeField] private Image XImage; // Image nền combo
     [SerializeField] private Image comboNumberUnit; // Image số hàng đơn vị (0-9)
     [SerializeField] private Image comboNumberTens; // Image số hàng chục (chỉ hiện khi >= 10)
@@ -49,15 +48,6 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
         if (comboNumberTens != null)
         {
             comboNumberTens.gameObject.SetActive(false);
-        }
-    }
-
-    private void Update()
-    {
-        // Update combo progress bar mỗi frame
-        if (comboProgressFill != null)
-        {
-            comboProgressFill.fillAmount = ComboManager.Instance.ComboProgress;
         }
     }
 
@@ -107,7 +97,21 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
                         if (comboImage != null)
                         {
                             comboScaleTween = comboImage.transform.DOScale(1f, comboScaleDuration * 0.5f).SetEase(Ease.InQuad);
-                            comboScaleTween = XImage.transform.DOScale(1f, comboScaleDuration * 0.5f).SetEase(Ease.InQuad);
+                        }
+                    });
+            }
+            
+            // Scale animation cho X image
+            if (XImage != null)
+            {
+                XImage.transform.localScale = Vector3.one;
+                XImage.transform.DOScale(comboScaleAmount, comboScaleDuration)
+                    .SetEase(Ease.OutBack)
+                    .OnComplete(() =>
+                    {
+                        if (XImage != null)
+                        {
+                            XImage.transform.DOScale(1f, comboScaleDuration * 0.5f).SetEase(Ease.InQuad);
                         }
                     });
             }
@@ -195,11 +199,17 @@ public class UIGamePlayManager : SingletonBase<UIGamePlayManager>
         {
             comboImage.gameObject.SetActive(show);
         }
+        
+        if (XImage != null)
+        {
+            XImage.gameObject.SetActive(show);
+        }
     }
 
     private void ResetComboAlpha()
     {
         if (comboImage != null) comboImage.color = Color.white;
+        if (XImage != null) XImage.color = Color.white;
         if (comboNumberUnit != null) comboNumberUnit.color = Color.white;
         if (comboNumberTens != null) comboNumberTens.color = Color.white;
     }

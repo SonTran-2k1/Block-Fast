@@ -6,36 +6,19 @@ public class ComboManager : SingletonBase<ComboManager>
 {
     private int currentCombo = 0;
     private const int MaxCombo = 9;
-    private float comboResetTimer = 0f;
-    private const float ComboResetDuration = 5f; // Thời gian combo tồn tại
 
     public int CurrentCombo => currentCombo;
-    public float ComboProgress => comboResetTimer / ComboResetDuration;
 
     // Event khi combo thay đổi
     public delegate void OnComboChanged(int newCombo);
 
     public event OnComboChanged ComboChanged;
 
-    private void Update()
-    {
-        // Giảm dần combo timer
-        if (currentCombo > 0)
-        {
-            comboResetTimer -= Time.deltaTime;
-            if (comboResetTimer <= 0)
-            {
-                ResetCombo();
-            }
-        }
-    }
-
     // Tăng combo khi ăn được block
     public void AddCombo()
     {
         int previousCombo = currentCombo;
         currentCombo = Mathf.Min(currentCombo + 1, MaxCombo);
-        comboResetTimer = ComboResetDuration;
 
         Debug.Log($"[ComboManager] Combo increased to {currentCombo}!");
         AudioManager.Instance.PlaySFX("Clear" + currentCombo);
@@ -54,7 +37,6 @@ public class ComboManager : SingletonBase<ComboManager>
         }
 
         currentCombo = 0;
-        comboResetTimer = 0;
     }
 
     // Lấy combo multiplier (1x, 2x, 3x, ... 9x)
