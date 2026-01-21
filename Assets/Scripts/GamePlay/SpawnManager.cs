@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Singleton;
 using UnityEngine;
 
@@ -55,6 +56,9 @@ public class SpawnManager : SingletonBase<SpawnManager>
     private readonly List<GameObject> currentBatchPieces = new List<GameObject>();
     private int piecesPlacedInBatch = 0;
 
+    public event Action GameOverDetected;
+    private bool isGameOver = false;
+
     private System.Random rng;
 
     protected override void Awake()
@@ -74,6 +78,11 @@ public class SpawnManager : SingletonBase<SpawnManager>
     // Gọi khi một shape được đặt xuống grid
     public void OnShapePlaced(GameObject placedShape)
     {
+        if (isGameOver)
+        {
+            return;
+        }
+
         currentBatchPieces.Remove(placedShape);
         piecesPlacedInBatch++;
 
@@ -117,14 +126,18 @@ public class SpawnManager : SingletonBase<SpawnManager>
 
         if (!anyCanFit)
         {
-            Debug.LogError("[SpawnManager] GAME OVER! Không còn shape nào có thể đặt vào grid!");
-
-            // TODO: Trigger Game Over UI
+            TriggerGameOver("Không còn shape nào có thể đặt vào grid!");
         }
     }
 
     public void SpawnBatch()
     {
+        if (isGameOver)
+        {
+            Debug.LogWarning("[SpawnManager] SpawnBatch called after game over. Ignoring.");
+            return;
+        }
+
         // Clear old pieces nếu còn
         foreach (var piece in currentBatchPieces)
         {
@@ -153,7 +166,7 @@ public class SpawnManager : SingletonBase<SpawnManager>
 
         if (fittingShapes.Count == 0)
         {
-            Debug.LogError("[SpawnManager] GAME OVER! Không có shape nào fit vào grid!");
+            TriggerGameOver("Không có shape nào fit vào grid!");
             return;
         }
 
@@ -219,26 +232,38 @@ public class SpawnManager : SingletonBase<SpawnManager>
         return fittingShapes;
     }
 
-    // Chọn shapes cho batch - đảm bảo có ít nhất shapes có thể fit
+    // Chọn shapes cho batch - đảm bảo có ít nhất shapes có thể fit và KHÔNG GIỐNG NHAU
     private List<BlockShape> SelectShapesForBatch(List<BlockShape> fittingShapes)
     {
         List<BlockShape> selected = new List<BlockShape>();
+        HashSet<string> selectedIds = new HashSet<string>();
 
         // Số shapes fit cần chọn (tối thiểu 1, tối đa là số shapes fit có sẵn hoặc piecesPerBatch)
         int guaranteedFitCount = Mathf.Min(2, fittingShapes.Count, piecesPerBatch);
 
-        // Random chọn các shapes fit (weighted)
+        // Random chọn các shapes fit (weighted) - KHÔNG TRÙNG LẠP
         List<BlockShape> availableFitting = new List<BlockShape>(fittingShapes);
 
         for (int i = 0; i < guaranteedFitCount && availableFitting.Count > 0; i++)
         {
             BlockShape chosen = WeightedRandomSelect(availableFitting);
             selected.Add(chosen);
+            selectedIds.Add(chosen.id);
 
-            // Có thể chọn lại shape cùng loại nên không remove
+            // REMOVE shape đã chọn để tránh duplicate trong batch này
+            availableFitting.RemoveAll(s => s.id == chosen.id);
         }
 
-        // Fill còn lại với random từ fitting shapes (vì chỉ có shapes fit mới được spawn)
+        // Fill còn lại - ưu tiên chọn shapes KHÁC những shapes đã có
+        while (selected.Count < piecesPerBatch && availableFitting.Count > 0)
+        {
+            BlockShape chosen = WeightedRandomSelect(availableFitting);
+            selected.Add(chosen);
+            selectedIds.Add(chosen.id);
+            availableFitting.RemoveAll(s => s.id == chosen.id);
+        }
+
+        // Nếu vẫn chưa đủ 3 shapes (vì grid đầy hoặc chỉ có ít loại), fallback với random từ fitting
         while (selected.Count < piecesPerBatch && fittingShapes.Count > 0)
         {
             BlockShape chosen = WeightedRandomSelect(fittingShapes);
@@ -248,7 +273,42 @@ public class SpawnManager : SingletonBase<SpawnManager>
         // Shuffle để không phải lúc nào shapes fit cũng ở đầu
         ShuffleList(selected);
 
+        Debug.Log($"[SpawnManager] Selected batch: {string.Join(", ", selected.Select(s => s.id))}");
+
         return selected;
+    }
+
+    private void TriggerGameOver(string reason)
+    {
+        if (isGameOver)
+        {
+            return;
+        }
+
+        isGameOver = true;
+        Debug.LogError($"[SpawnManager] GAME OVER! {reason}");
+        GameOverDetected?.Invoke();
+    }
+
+    /// <summary>
+    /// Restart game flow after game over: clears current pieces and allows spawning again.
+    /// </summary>
+    public void RestartAfterGameOver()
+    {
+        isGameOver = false;
+
+        foreach (var piece in currentBatchPieces)
+        {
+            if (piece != null)
+            {
+                Destroy(piece);
+            }
+        }
+
+        currentBatchPieces.Clear();
+        piecesPlacedInBatch = 0;
+
+        SpawnBatch();
     }
 
     // Weighted random selection

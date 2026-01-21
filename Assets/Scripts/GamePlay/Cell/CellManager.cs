@@ -225,6 +225,24 @@ public class CellManager : SingletonBase<CellManager>
         }
         Debug.Log($"[CellManager] Cleared column {col}");
     }
+
+    /// <summary>
+    /// Reset toàn bộ board về trạng thái trống cho lượt chơi mới.
+    /// </summary>
+    public void ResetBoard()
+    {
+        if (gridDict == null || gridDict.Count == 0)
+        {
+            BuildGridDictionary();
+        }
+
+        foreach (var kvp in gridDict)
+        {
+            kvp.Value?.ClearBlock();
+        }
+
+        Debug.Log("[CellManager] Board reset: cleared all cells");
+    }
     
     // Kiểm tra xem một shape pattern có thể đặt vào grid không (có ít nhất 1 vị trí hợp lệ)
     public bool CanShapeFitAnywhere(Vector2Int[] shapePattern)
