@@ -21,6 +21,9 @@ public class ScoreManager : SingletonBase<ScoreManager>
         
         Debug.Log($"[ScoreManager] Added {scoreToAdd} points ({blockCount} blocks × {comboMultiplier} combo). Total: {currentScore}");
         ScoreChanged?.Invoke(currentScore);
+        
+        // Check best score khi thả shape xuống
+        BestScoreManager.Instance.CheckAndUpdateBestScore(currentScore);
     }
 
     // Thêm điểm từ clear hàng/cột (1 hàng/cột = 8 điểm * combo multiplier)
