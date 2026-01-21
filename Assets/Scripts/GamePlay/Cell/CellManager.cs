@@ -179,6 +179,66 @@ public class CellManager : SingletonBase<CellManager>
         }
         Debug.Log($"[CellManager] Cleared column {col}");
     }
+    
+    // Kiểm tra xem một shape pattern có thể đặt vào grid không (có ít nhất 1 vị trí hợp lệ)
+    public bool CanShapeFitAnywhere(Vector2Int[] shapePattern)
+    {
+        if (shapePattern == null || shapePattern.Length == 0)
+            return false;
+            
+        if (gridDict == null) BuildGridDictionary();
+        
+        // Duyệt qua tất cả các vị trí có thể trên grid
+        for (int x = 0; x < GridSize; x++)
+        {
+            for (int y = 0; y < GridSize; y++)
+            {
+                Vector2Int anchorPos = new Vector2Int(x, y);
+                if (CanPlaceShapeAt(shapePattern, anchorPos))
+                {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    // Kiểm tra xem shape có thể đặt tại vị trí cụ thể không
+    public bool CanPlaceShapeAt(Vector2Int[] shapePattern, Vector2Int anchorPos)
+    {
+        if (shapePattern == null || shapePattern.Length == 0)
+            return false;
+            
+        if (gridDict == null) BuildGridDictionary();
+        
+        foreach (Vector2Int offset in shapePattern)
+        {
+            Vector2Int targetPos = anchorPos + offset;
+            
+            // Check bounds
+            if (targetPos.x < 0 || targetPos.x >= GridSize ||
+                targetPos.y < 0 || targetPos.y >= GridSize)
+            {
+                return false;
+            }
+            
+            // Check xem cell có block chưa
+            if (gridDict.TryGetValue(targetPos, out Cell cell))
+            {
+                if (cell.HasBlock())
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false; // Cell không tồn tại
+            }
+        }
+        
+        return true;
+    }
 
     // Hàm nạp vào list
     public void AddCell(Cell cell)

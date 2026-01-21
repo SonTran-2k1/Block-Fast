@@ -83,6 +83,9 @@ public class ShapeClick : MonoBehaviour
                                 // TODO: Thêm scoring system ở đây nếu cần
                                 AudioManager.Instance.PlaySFX("Clear1");
                             }
+                            
+                            // Notify SpawnManager rằng shape đã được đặt
+                            SpawnManager.Instance.OnShapePlaced(gameObject);
 
                             // Destroy shape parent (vì các block đã được re-parent vào cells)
                             Destroy(gameObject);
